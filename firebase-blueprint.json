@@ -1,0 +1,142 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile containing authentication details, roles, and status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User UID" },
+        "name": { "type": "string", "maxLength": 100, "description": "Full name" },
+        "email": { "type": "string", "maxLength": 120, "description": "User email address" },
+        "role": { "type": "string", "enum": ["owner", "editor", "contributor"], "description": "Access control role" },
+        "avatar_url": { "type": "string", "maxLength": 500, "description": "Avatar photo URL" },
+        "status": { "type": "string", "enum": ["active", "suspended"], "description": "Account status" },
+        "created_at": { "type": "string", "description": "ISO timestamp of creation" }
+      },
+      "required": ["id", "name", "email", "role"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Content taxonomy category",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Category identifier" },
+        "name": { "type": "string", "maxLength": 100, "description": "Category name" },
+        "color": { "type": "string", "maxLength": 50, "description": "Display color hex or badge class" },
+        "description": { "type": "string", "maxLength": 300, "description": "Category description" }
+      },
+      "required": ["id", "name"]
+    },
+    "ContentItem": {
+      "title": "ContentItem",
+      "description": "Marketing content draft or published post",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Content identifier" },
+        "title": { "type": "string", "maxLength": 200, "description": "Title of content post" },
+        "caption": { "type": "string", "maxLength": 3000, "description": "Post caption or copy" },
+        "platform": { "type": "string", "enum": ["instagram", "facebook", "tiktok", "whatsapp"], "description": "Target social channel" },
+        "content_type": { "type": "string", "enum": ["image", "video", "carousel", "text"], "description": "Media content format" },
+        "status": { "type": "string", "enum": ["draft", "pending_review", "approved", "scheduled", "published", "archived"], "description": "Approval workflow state" },
+        "media_url": { "type": "string", "maxLength": 1000, "description": "Media attachment URL" },
+        "created_by": { "type": "string", "maxLength": 100, "description": "Author user ID or name" },
+        "created_at": { "type": "string", "description": "Creation timestamp" },
+        "updated_at": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["id", "title", "platform", "content_type", "status"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "Content schedule item pinned to calendar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Schedule event ID" },
+        "content_id": { "type": "string", "maxLength": 100, "description": "Linked content item ID" },
+        "platform": { "type": "string", "maxLength": 50, "description": "Platform or channel" },
+        "scheduled_at": { "type": "string", "description": "Scheduled publish datetime" },
+        "assigned_to": { "type": "string", "maxLength": 100, "description": "Assigned team member" },
+        "status": { "type": "string", "enum": ["scheduled", "published", "missed"], "description": "Schedule status" },
+        "notes": { "type": "string", "maxLength": 500, "description": "Optional notes or checklist" },
+        "created_at": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "content_id", "platform", "scheduled_at", "status"]
+    },
+    "RawContentItem": {
+      "title": "RawContentItem",
+      "description": "Raw media archive or reference footage item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Raw asset ID" },
+        "title": { "type": "string", "maxLength": 200, "description": "Title or event name" },
+        "link": { "type": "string", "maxLength": 1000, "description": "Drive or cloud storage link" },
+        "category": { "type": "string", "maxLength": 100, "description": "Categorization" },
+        "file_type": { "type": "string", "maxLength": 50, "description": "File or footage type" },
+        "notes": { "type": "string", "maxLength": 1000, "description": "Notes on footage usage" },
+        "created_by": { "type": "string", "maxLength": 100, "description": "Uploader name or ID" },
+        "created_at": { "type": "string", "description": "Created timestamp" }
+      },
+      "required": ["id", "title", "link"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "CMS institution settings and rules",
+      "type": "object",
+      "properties": {
+        "require_approval_before_scheduling": { "type": "boolean", "description": "Strict approval gate" },
+        "official_whatsapp": { "type": "string", "maxLength": 200, "description": "WhatsApp URL" },
+        "official_whatsapp_number": { "type": "string", "maxLength": 50, "description": "WhatsApp contact" },
+        "official_email": { "type": "string", "maxLength": 100, "description": "Institutional email" },
+        "operating_hours": { "type": "string", "maxLength": 100, "description": "Office operating hours" },
+        "official_address": { "type": "string", "maxLength": 300, "description": "Physical address" },
+        "company_name": { "type": "string", "maxLength": 100, "description": "Company registration name" }
+      },
+      "required": ["company_name"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "System audit trail record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Log entry ID" },
+        "user_id": { "type": "string", "maxLength": 100, "description": "Acting user ID" },
+        "user_name": { "type": "string", "maxLength": 100, "description": "Acting user name" },
+        "action": { "type": "string", "maxLength": 100, "description": "Action performed" },
+        "target_type": { "type": "string", "maxLength": 50, "description": "Entity category modified" },
+        "target_id": { "type": "string", "maxLength": 100, "description": "Entity ID modified" },
+        "target_title": { "type": "string", "maxLength": 200, "description": "Entity title" },
+        "created_at": { "type": "string", "description": "Timestamp of action" }
+      },
+      "required": ["id", "action", "target_type"]
+    }
+  },
+  "firestore": {
+    "/profiles/{profileId}": {
+      "schema": "UserProfile",
+      "description": "Staff profile directory"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Content taxonomy categories"
+    },
+    "/content_items/{contentId}": {
+      "schema": "ContentItem",
+      "description": "Editorial marketing content pieces"
+    },
+    "/calendar/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Content publishing schedules"
+    },
+    "/raw_content/{rawId}": {
+      "schema": "RawContentItem",
+      "description": "Raw media and footage vault archives"
+    },
+    "/settings/{settingId}": {
+      "schema": "SystemSettings",
+      "description": "System configuration doc"
+    },
+    "/activity_logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Audit trail log entries"
+    }
+  }
+}

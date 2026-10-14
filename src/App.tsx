@@ -26,6 +26,7 @@ import { ContentCalendarView } from './components/ContentCalendarView.tsx';
 import { AnalyticsView } from './components/AnalyticsView.tsx';
 import { SettingsView } from './components/SettingsView.tsx';
 import { OasisChatWidget } from './components/OasisChatWidget.tsx';
+import { testConnection, auth, onAuthStateChanged, logoutFirebase } from './services/firebase.ts';
 
 export default function App() {
   // Current Active User & Auth State
@@ -122,6 +123,13 @@ export default function App() {
 
   useEffect(() => {
     loadAllData();
+    testConnection();
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser && fbUser.email) {
+        console.log('Firebase user active:', fbUser.email);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   // Auth Handlers
@@ -136,7 +144,12 @@ export default function App() {
     setStoredUserId(user.id);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutFirebase();
+    } catch (e) {
+      console.warn('Firebase logout warning:', e);
+    }
     setIsLoggedOut(true);
   };
 

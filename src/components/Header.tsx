@@ -149,9 +149,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-xs">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-emerald-900">Database Engine Connected</p>
+                    <p className="font-semibold text-emerald-900">Firebase & Database Connected</p>
                     <p className="text-emerald-700 text-[11px]">
-                      PostgreSQL dummy store synchronized and active in real time.
+                      Google Cloud Firestore (asia-southeast1) & Firebase Auth active with security rules.
                     </p>
                   </div>
                 </div>

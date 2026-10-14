@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'hazwansabo@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Connection validation probe document
+    match /test/{testId} {
+      allow read: if true;
+    }
+
+    // Profiles Collection
+    match /profiles/{profileId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(profileId) && (isAdmin() || request.auth.uid == profileId);
+      allow delete: if isAdmin();
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(categoryId);
+      allow delete: if isAdmin();
+    }
+
+    // Content Items
+    match /content_items/{contentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(contentId);
+      allow update: if isSignedIn() && isValidId(contentId);
+      allow delete: if isSignedIn() && (isAdmin() || resource.data.created_by == request.auth.uid);
+    }
+
+    // Calendar Events
+    match /calendar/{eventId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(eventId);
+      allow delete: if isSignedIn();
+    }
+
+    // Raw Content Vault
+    match /raw_content/{rawId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(rawId);
+      allow delete: if isSignedIn() && (isAdmin() || resource.data.created_by == request.auth.uid);
+    }
+
+    // System Settings (Restricted to Owners / Admins)
+    match /settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Activity Logs
+    match /activity_logs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(logId);
+    }
+  }
+}
