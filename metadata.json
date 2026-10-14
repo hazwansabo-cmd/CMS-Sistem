@@ -1,0 +1,7 @@
+{
+  "name": "Al Amin Edu Oasis CMS",
+  "description": "Marketing Content Management System (CMS) & LMS for Al Amin Edu Oasis featuring relational database, editorial calendar, analytics, and Oasis AI assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
