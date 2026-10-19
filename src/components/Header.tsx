@@ -120,9 +120,11 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <AlertTriangle className="w-4 h-4 text-[#E5484D] mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-semibold text-red-900">1 Missed Schedule Entry</p>
+                      <p className="font-semibold text-red-900">
+                        {missedEntriesCount} Missed Schedule {missedEntriesCount > 1 ? 'Entries' : 'Entry'}
+                      </p>
                       <p className="text-red-700 text-[11px]">
-                        Threads post for "Multiplication Tips" has passed its scheduled time without being marked published.
+                        Post(s) have passed their scheduled publication time without being marked published.
                       </p>
                     </div>
                   </div>
@@ -138,9 +140,11 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <Clock className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-semibold text-amber-900">Content Pending Approval</p>
+                      <p className="font-semibold text-amber-900">
+                        {pendingApprovalCount} Content Item{pendingApprovalCount > 1 ? 's' : ''} Pending Approval
+                      </p>
                       <p className="text-amber-700 text-[11px]">
-                        1 staff post requires Owner review & approval before it can be scheduled.
+                        Staff post(s) require Owner review & approval before being scheduled.
                       </p>
                     </div>
                   </div>

@@ -71,16 +71,16 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     platform: 'instagram' as SocialPlatform,
     period_start: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
     period_end: new Date().toISOString().split('T')[0],
-    followers: 22400,
-    followers_gained: 1450,
-    reach: 78900,
-    impressions: 134200,
-    likes: 6720,
-    comments: 980,
-    shares: 890,
-    saves: 1340,
-    link_clicks: 2850,
-    profile_visits: 5120,
+    followers: 0,
+    followers_gained: 0,
+    reach: 0,
+    impressions: 0,
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    saves: 0,
+    link_clicks: 0,
+    profile_visits: 0,
   });
 
   // Ad Spend Form
@@ -88,8 +88,8 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     platform: 'facebook' as SocialPlatform,
     period_start: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
     period_end: new Date().toISOString().split('T')[0],
-    amount_rm: 500,
-    results: 45,
+    amount_rm: 0,
+    results: 0,
   });
 
   // Aggregated KPI Totals (RPT-04)
@@ -365,25 +365,38 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             </div>
           </div>
 
-          <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsBarChart data={platformComparisonData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="platform" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    borderRadius: '12px',
-                    border: '1px solid #E3F6F5',
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px' }} />
-                <Bar dataKey="Reach" fill="#0E9F9A" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="Interactions" fill="#F59E0B" radius={[6, 6, 0, 0]} />
-              </RechartsBarChart>
-            </ResponsiveContainer>
-          </div>
+          {platformComparisonData.length === 0 ? (
+            <div className="h-72 w-full flex flex-col items-center justify-center text-center text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+              <TrendingUp className="w-8 h-8 text-gray-300 mb-2" />
+              <p className="text-xs">No channel analytics data to compare yet.</p>
+              <button
+                onClick={() => setEntryModalOpen(true)}
+                className="mt-2 text-xs text-[#0E9F9A] font-semibold hover:underline cursor-pointer"
+              >
+                + Add First Metric Entry
+              </button>
+            </div>
+          ) : (
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsBarChart data={platformComparisonData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis dataKey="platform" stroke="#9ca3af" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      borderRadius: '12px',
+                      border: '1px solid #E3F6F5',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '11px' }} />
+                  <Bar dataKey="Reach" fill="#0E9F9A" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="Interactions" fill="#F59E0B" radius={[6, 6, 0, 0]} />
+                </RechartsBarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Interaction Distribution Donut Chart (5 Cols) */}
@@ -394,24 +407,31 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             </h3>
             <p className="text-xs text-gray-500">Distribution of likes, comments, shares, and saves</p>
 
-            <div className="h-56 w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={interactionDistribution}
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {interactionDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            {totalInteractions === 0 ? (
+              <div className="h-56 w-full flex flex-col items-center justify-center text-center text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 mt-2">
+                <Target className="w-8 h-8 text-gray-300 mb-2" />
+                <p className="text-xs">No engagement data recorded yet.</p>
+              </div>
+            ) : (
+              <div className="h-56 w-full mt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={interactionDistribution}
+                      innerRadius={55}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {interactionDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs pt-3 border-t border-gray-100">

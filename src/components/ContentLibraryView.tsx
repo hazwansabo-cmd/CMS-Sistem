@@ -109,14 +109,12 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
     platforms: ['facebook', 'instagram'] as SocialPlatform[],
     overridePlatform: 'threads' as SocialPlatform,
     overrideMessage: '',
-    assets: [
-      {
-        url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80',
-        type: 'image' as 'image' | 'video',
-        position: 1,
-        alt_text: 'Al Amin educational campaign',
-      },
-    ],
+    assets: [] as Array<{
+      url: string;
+      type: 'image' | 'video';
+      position: number;
+      alt_text?: string;
+    }>,
   });
 
   // Filter items
@@ -160,25 +158,18 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
     setFormData({
       title: '',
       message: '',
-      cta_text: 'Register Now',
-      cta_url: 'https://alaminedu.com.my',
+      cta_text: '',
+      cta_url: '',
       format: 'poster',
       status: 'draft',
       category_id: categories[0]?.id || '',
-      tags: ['AlAminEdu', 'IslamicEducation'],
+      tags: [],
       tagInput: '',
       video_url: '',
       platforms: ['facebook', 'instagram'],
       overridePlatform: 'threads',
       overrideMessage: '',
-      assets: [
-        {
-          url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80',
-          type: 'image',
-          position: 1,
-          alt_text: 'Al Amin poster',
-        },
-      ],
+      assets: [],
     });
     setEditModalOpen(true);
   };
@@ -195,14 +186,7 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
             position: a.position,
             alt_text: a.alt_text || '',
           }))
-        : [
-            {
-              url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80',
-              type: 'image' as 'image' | 'video',
-              position: 1,
-              alt_text: 'Al Amin promo asset',
-            },
-          ];
+        : [];
 
     setFormData({
       title: item.title,
@@ -556,8 +540,23 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
 
       {/* Main Grid View (LIB-02) */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => {
+        filteredItems.length === 0 ? (
+          <div className="py-16 text-center glass-card rounded-2xl border border-white/70">
+            <Layers className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h4 className="text-sm font-bold text-gray-700">No content found in library</h4>
+            <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+              Get started by creating your first post or educational asset.
+            </p>
+            <button
+              onClick={handleOpenCreate}
+              className="mt-4 px-4 py-2 rounded-xl bg-[#0E9F9A] hover:bg-[#0A726F] text-white text-xs font-semibold shadow-md shadow-[#0E9F9A]/20 transition cursor-pointer"
+            >
+              + Create First Content Item
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((item) => {
             const isSelected = selectedIds.includes(item.id);
             const firstAsset = item.assets?.[0];
 
@@ -737,7 +736,7 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
             );
           })}
         </div>
-      ) : (
+      )) : (
         /* List View (LIB-02) */
         <div className="glass-card rounded-2xl overflow-hidden border border-white/70">
           <div className="overflow-x-auto">
@@ -763,12 +762,26 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50/60 transition">
-                    <td className="p-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(item.id)}
+                {filteredItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="p-12 text-center text-gray-400">
+                      <Layers className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-xs font-semibold text-gray-600">No content items found in library</p>
+                      <button
+                        onClick={handleOpenCreate}
+                        className="mt-2 text-xs text-[#0E9F9A] font-semibold hover:underline cursor-pointer"
+                      >
+                        + Create your first post
+                      </button>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredItems.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50/60 transition">
+                      <td className="p-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(item.id)}
                         onChange={() => handleToggleSelect(item.id)}
                       />
                     </td>
@@ -837,7 +850,8 @@ export const ContentLibraryView: React.FC<ContentLibraryViewProps> = ({
                       </div>
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
               </tbody>
             </table>
           </div>

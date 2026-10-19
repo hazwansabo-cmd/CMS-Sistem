@@ -157,7 +157,7 @@ export default function App() {
     if (confirm('Are you sure you want to reset all data back to the default seed state?')) {
       await api.resetDatabase();
       await loadAllData();
-      alert('The dummy database has been successfully reset to its default state!');
+      alert('The database has been successfully reset to a clean state!');
     }
   };
 

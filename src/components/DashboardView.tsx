@@ -102,13 +102,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     };
   });
 
-  // Trend data mock curve (DASH-04)
-  const trendData = [
-    { day: 'Week 1', interactions: 3400, reach: 21000 },
-    { day: 'Week 2', interactions: 4800, reach: 32000 },
-    { day: 'Week 3', interactions: 7100, reach: 49000 },
-    { day: 'Week 4', interactions: 9500, reach: 68000 },
-  ];
+  // Trend data derived from real analytics data (empty if no data yet)
+  const trendData =
+    analyticsData.length > 0
+      ? analyticsData.map((d, i) => ({
+          day: `${d.platform.toUpperCase()} (P${i + 1})`,
+          interactions: d.likes + d.comments + d.shares + d.saves,
+          reach: d.reach,
+        }))
+      : [];
+
+  const topPlatform =
+    platformStats.length > 0
+      ? [...platformStats].sort((a, b) => b.reach - a.reach)[0]
+      : null;
 
   const getPlatformBadgeColor = (p: string) => {
     switch (p.toLowerCase()) {
@@ -395,24 +402,42 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="text-[11px] font-bold text-[#0E9F9A] uppercase tracking-wider">
                 🏆 Top Performing Channel (DASH-04)
               </span>
-              <span className="text-xs font-semibold bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">
-                Instagram & TikTok
-              </span>
+              {topPlatform ? (
+                <span className="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full capitalize">
+                  {topPlatform.platform}
+                </span>
+              ) : (
+                <span className="text-xs font-medium bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                  No data yet
+                </span>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              <div className="p-3 rounded-xl bg-white/90 border border-gray-100 shadow-2xs">
-                <p className="text-[11px] text-gray-500">Total Reach (IG)</p>
-                <p className="text-lg font-bold text-gray-800 mt-1">78.9K</p>
-                <p className="text-[10px] text-emerald-600 font-medium">+18.5% vs previous</p>
-              </div>
+            {topPlatform ? (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="p-3 rounded-xl bg-white/90 border border-gray-100 shadow-2xs">
+                  <p className="text-[11px] text-gray-500 capitalize">Total Reach ({topPlatform.platform})</p>
+                  <p className="text-lg font-bold text-gray-800 mt-1">{topPlatform.reach.toLocaleString()}</p>
+                  <p className="text-[10px] text-emerald-600 font-medium">+{topPlatform.followersGained} new</p>
+                </div>
 
-              <div className="p-3 rounded-xl bg-white/90 border border-gray-100 shadow-2xs">
-                <p className="text-[11px] text-gray-500">Engagement Rate</p>
-                <p className="text-lg font-bold text-[#0A726F] mt-1">8.5%</p>
-                <p className="text-[10px] text-emerald-600 font-medium">Above education benchmark</p>
+                <div className="p-3 rounded-xl bg-white/90 border border-gray-100 shadow-2xs">
+                  <p className="text-[11px] text-gray-500">Engagement Rate</p>
+                  <p className="text-lg font-bold text-[#0A726F] mt-1">{topPlatform.engagementRate}%</p>
+                  <p className="text-[10px] text-emerald-600 font-medium">{topPlatform.interactions.toLocaleString()} interactions</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-white/60 border border-gray-100 text-center text-xs text-gray-400">
+                <p>No channel metrics recorded yet.</p>
+                <button
+                  onClick={onNewAnalytics}
+                  className="mt-2 text-xs text-[#0E9F9A] font-semibold hover:underline cursor-pointer"
+                >
+                  + Add Channel Metrics
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Platform Performance breakdown list (DASH-03) */}
@@ -430,34 +455,40 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <div className="space-y-3">
-              {platformStats.slice(0, 4).map((stat) => (
-                <div
-                  key={stat.platform}
-                  className="p-2.5 rounded-xl bg-gray-50/70 border border-gray-100 flex items-center justify-between text-xs"
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-md font-semibold capitalize ${getPlatformBadgeColor(
-                        stat.platform
-                      )}`}
-                    >
-                      {stat.platform}
-                    </span>
-                    <span className="text-gray-600 font-medium">
-                      {stat.followers.toLocaleString()} followers
-                    </span>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="font-bold text-gray-800">
-                      {stat.reach.toLocaleString()} reach
-                    </span>
-                    <span className="text-[10px] text-emerald-600 ml-2 font-medium">
-                      +{stat.followersGained} new
-                    </span>
-                  </div>
+              {platformStats.length === 0 ? (
+                <div className="p-4 rounded-xl bg-gray-50/50 text-center text-xs text-gray-400">
+                  <p>No channels tracked yet.</p>
                 </div>
-              ))}
+              ) : (
+                platformStats.slice(0, 4).map((stat) => (
+                  <div
+                    key={stat.platform}
+                    className="p-2.5 rounded-xl bg-gray-50/70 border border-gray-100 flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-md font-semibold capitalize ${getPlatformBadgeColor(
+                          stat.platform
+                        )}`}
+                      >
+                        {stat.platform}
+                      </span>
+                      <span className="text-gray-600 font-medium">
+                        {stat.followers.toLocaleString()} followers
+                      </span>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="font-bold text-gray-800">
+                        {stat.reach.toLocaleString()} reach
+                      </span>
+                      <span className="text-[10px] text-emerald-600 ml-2 font-medium">
+                        +{stat.followersGained} new
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -470,61 +501,76 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-heading font-bold text-[#0A726F]">
-                Reach & Interaction Trend (30 Days) (DASH-04)
+                Reach & Interaction Trend (DASH-04)
               </h3>
-              <p className="text-xs text-gray-500">Real-time charts powered by Recharts</p>
+              <p className="text-xs text-gray-500">Real-time metrics from recorded channel periods</p>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="flex items-center gap-1 text-gray-600">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#0E9F9A]" />
-                Reach
-              </span>
-              <span className="flex items-center gap-1 text-gray-600">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
-                Interactions
-              </span>
-            </div>
+            {trendData.length > 0 && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="flex items-center gap-1 text-gray-600">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#0E9F9A]" />
+                  Reach
+                </span>
+                <span className="flex items-center gap-1 text-gray-600">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                  Interactions
+                </span>
+              </div>
+            )}
           </div>
 
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="day" stroke="#9ca3af" fontSize={12} tickLine={false} />
-                <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    borderRadius: '12px',
-                    border: '1px solid #E3F6F5',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="reach"
-                  stroke="#0E9F9A"
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: '#0E9F9A' }}
-                  activeDot={{ r: 6 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="interactions"
-                  stroke="#F59E0B"
-                  strokeWidth={2}
-                  dot={{ r: 4, fill: '#F59E0B' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {trendData.length === 0 ? (
+            <div className="h-64 w-full flex flex-col items-center justify-center text-center text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+              <TrendingUp className="w-8 h-8 text-gray-300 mb-2" />
+              <p className="text-xs">No analytics trend data recorded yet.</p>
+              <button
+                onClick={onNewAnalytics}
+                className="mt-2 text-xs text-[#0E9F9A] font-semibold hover:underline cursor-pointer"
+              >
+                + Record Channel Analytics
+              </button>
+            </div>
+          ) : (
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                  <XAxis dataKey="day" stroke="#9ca3af" fontSize={12} tickLine={false} />
+                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      borderRadius: '12px',
+                      border: '1px solid #E3F6F5',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="reach"
+                    stroke="#0E9F9A"
+                    strokeWidth={2.5}
+                    dot={{ r: 4, fill: '#0E9F9A' }}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="interactions"
+                    stroke="#F59E0B"
+                    strokeWidth={2}
+                    dot={{ r: 4, fill: '#F59E0B' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Recent & High Performing Content (DASH-05) */}
         <div className="lg:col-span-5 glass-card rounded-2xl p-6 border border-white/70">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-heading font-bold text-gray-800">
-              Recent & Featured Content (DASH-05)
+              Recent Content (DASH-05)
             </h3>
             <button
               onClick={onNavigateToLibrary}
@@ -535,41 +581,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="space-y-3">
-            {contentItems.slice(0, 4).map((item) => (
-              <div
-                key={item.id}
-                onClick={() => onViewContentDetail(item)}
-                className="p-3 rounded-xl bg-white/70 hover:bg-[#E3F6F5]/40 border border-gray-100 hover:border-[#0E9F9A]/30 transition cursor-pointer flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-3 truncate">
-                  {item.assets && item.assets[0]?.url ? (
-                    <img
-                      src={item.assets[0].url}
-                      alt=""
-                      className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
-                      <Layers className="w-5 h-5" />
-                    </div>
-                  )}
+            {contentItems.length === 0 ? (
+              <div className="py-12 text-center text-gray-400">
+                <Layers className="w-8 h-8 mx-auto mb-2 opacity-40 text-gray-400" />
+                <p className="text-xs">No content items created yet.</p>
+                <button
+                  onClick={onNewContent}
+                  className="mt-2 text-xs text-[#0E9F9A] font-semibold hover:underline cursor-pointer"
+                >
+                  + Create your first post
+                </button>
+              </div>
+            ) : (
+              contentItems.slice(0, 4).map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => onViewContentDetail(item)}
+                  className="p-3 rounded-xl bg-white/70 hover:bg-[#E3F6F5]/40 border border-gray-100 hover:border-[#0E9F9A]/30 transition cursor-pointer flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 truncate">
+                    {item.assets && item.assets[0]?.url ? (
+                      <img
+                        src={item.assets[0].url}
+                        alt=""
+                        className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
+                        <Layers className="w-5 h-5" />
+                      </div>
+                    )}
 
-                  <div className="truncate">
-                    <p className="text-xs font-semibold text-gray-800 truncate">{item.title}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] text-gray-400 uppercase font-bold">
-                        {item.format}
-                      </span>
-                      <span className="text-[10px] text-[#0E9F9A]">
-                        Scheduled {item.times_scheduled || 0}x
-                      </span>
+                    <div className="truncate">
+                      <p className="text-xs font-semibold text-gray-800 truncate">{item.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-gray-400 uppercase font-bold">
+                          {item.format}
+                        </span>
+                        <span className="text-[10px] text-[#0E9F9A]">
+                          Scheduled {item.times_scheduled || 0}x
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </div>
-            ))}
+                  <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

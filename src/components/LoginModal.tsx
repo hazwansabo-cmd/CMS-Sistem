@@ -113,7 +113,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, availabl
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-300 flex-shrink-0" />
-              <span>Live relational dummy database synchronization</span>
+              <span>Live database & Firebase synchronization</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-300 flex-shrink-0" />
@@ -232,38 +232,40 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, availabl
             </button>
           </form>
 
-          {/* Quick Demo Role Selector Pills */}
-          <div className="mt-6 pt-5 border-t border-gray-100">
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-              Quick Demo Account Switch:
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {availableUsers.slice(0, 2).map((user) => (
-                <button
-                  key={user.id}
-                  type="button"
-                  onClick={() => handleSelectDemoUser(user)}
-                  className={`p-2.5 rounded-xl border text-left transition flex items-center gap-2 ${
-                    email.toLowerCase() === user.email.toLowerCase()
-                      ? 'border-[#0E9F9A] bg-[#E3F6F5]/50 ring-1 ring-[#0E9F9A]'
-                      : 'border-gray-200 bg-gray-50/60 hover:bg-gray-100'
-                  }`}
-                >
-                  <img
-                    src={user.avatar_url}
-                    alt=""
-                    className="w-7 h-7 rounded-full object-cover flex-shrink-0"
-                  />
-                  <div className="truncate">
-                    <p className="text-xs font-semibold text-gray-800 truncate">{user.full_name}</p>
-                    <p className="text-[10px] text-[#0E9F9A] font-medium capitalize">
-                      {user.role === 'owner' ? '👑 Owner' : '💼 Staff'}
-                    </p>
-                  </div>
-                </button>
-              ))}
+          {/* Registered System Accounts */}
+          {availableUsers.length > 0 && (
+            <div className="mt-6 pt-5 border-t border-gray-100">
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                Active System Accounts:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {availableUsers.map((user) => (
+                  <button
+                    key={user.id}
+                    type="button"
+                    onClick={() => handleSelectDemoUser(user)}
+                    className={`p-2.5 rounded-xl border text-left transition flex items-center gap-2 cursor-pointer ${
+                      email.toLowerCase() === user.email.toLowerCase()
+                        ? 'border-[#0E9F9A] bg-[#E3F6F5]/50 ring-1 ring-[#0E9F9A]'
+                        : 'border-gray-200 bg-gray-50/60 hover:bg-gray-100'
+                    }`}
+                  >
+                    <img
+                      src={user.avatar_url}
+                      alt=""
+                      className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                    />
+                    <div className="truncate">
+                      <p className="text-xs font-semibold text-gray-800 truncate">{user.full_name}</p>
+                      <p className="text-[10px] text-[#0E9F9A] font-medium capitalize">
+                        {user.role === 'owner' ? '👑 Owner' : '💼 Staff'}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

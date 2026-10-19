@@ -814,11 +814,17 @@ export const ContentCalendarView: React.FC<ContentCalendarViewProps> = ({
                   onChange={(e) => setSelectedContentId(e.target.value)}
                   className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none"
                 >
-                  {contentItems.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.title} ({c.format})
+                  {contentItems.length === 0 ? (
+                    <option value="" disabled>
+                      No content in library yet — please create a post first
                     </option>
-                  ))}
+                  ) : (
+                    contentItems.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title} ({c.format})
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
